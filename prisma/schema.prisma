@@ -15,7 +15,7 @@ datasource db {
 
 model Article {
   id          String   @id @default(uuid())
-  title       String
+  title       String   @unique
   description String?
   body        String   @db.Text
   published   Boolean  @default(false)
