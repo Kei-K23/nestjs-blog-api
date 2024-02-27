@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthEntity } from './entities/auth.entity';
 import { JwtService } from '@nestjs/jwt';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,7 @@ export class AuthService {
       throw new NotFoundException(`User with email : ${email} not found`);
     }
 
-    const isMatch = user.password === password;
+    const isMatch = await argon2.verify(user.password, password);
 
     if (!isMatch) {
       throw new UnauthorizedException(`Invalid password`);
