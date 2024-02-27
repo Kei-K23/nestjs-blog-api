@@ -6,13 +6,15 @@ import {
   Patch,
   Param,
   Delete,
-  NotFoundException,
 } from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { ArticleEntity } from './entities/article.entity';
+import {
+  ArticleEntity,
+  ArticleEntityWithAuthor,
+} from './entities/article.entity';
 
 @Controller('articles')
 @ApiTags('articles')
@@ -27,26 +29,26 @@ export class ArticlesController {
 
   @Get()
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
-  findAll() {
-    return this.articlesService.findAll();
+  async findAll() {
+    const articles = await this.articlesService.findAll();
+
+    return articles;
   }
 
   @Get('drafts')
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
-  findDrafts() {
-    return this.articlesService.findDrafts();
+  async findDrafts() {
+    const articles = await this.articlesService.findDrafts();
+
+    return articles;
   }
 
   @Get(':id')
-  @ApiOkResponse({ type: ArticleEntity })
+  @ApiOkResponse({ type: ArticleEntityWithAuthor })
   async findOne(@Param('id') id: string) {
     const article = await this.articlesService.findOne(id);
 
-    if (!article) {
-      throw new NotFoundException(`Article ${id} not found`);
-    }
-
-    return article;
+    return new ArticleEntityWithAuthor(article);
   }
 
   @Patch(':id')
